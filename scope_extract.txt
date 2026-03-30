@@ -1,0 +1,168 @@
+RoomAI Designer — Скоуп технологій
+AI-дизайнер інтер'єру  ·  Версія 2.0  ·  2025
+1. Загальний опис продукту
+RoomAI Designer — це повністю клієнтський веб-застосунок (SPA) для автоматизованого дизайну інтер'єрів. Користувач малює довільний полігон кімнати, вибирає тип приміщення, стиль та меблі — вбудований AI генерує до 4 варіантів розстановки з рекомендаціями дизайнера. Весь функціонал виконується у браузері без серверних запитів.
+Архітектурний огляд — шари системи
+Шар системи
+Технології
+Відповідальний розробник
+К-сть у команді
+Фронтенд
+React 18 (JSX, Hooks), HTML5 Canvas API, Inline CSS Tokens, Google Fonts
+Frontend Developer
+1–2 ос.
+AI Движок
+FurnitureAI (Weighted Scoring), SmartPlacementAI, DesignChatAI, GNN PyTorch
+AI/ML Developer
+1 ос.
+База даних
+React State (in-memory), LAYOUT_DB (16 шаблонів), FURNITURE_DB (50+ меблів)
+Frontend / AI Dev
+—
+Бекенд
+Client-only SPA (без серверу), Vite Bundler
+Tech Lead / DevOps
+0.5 ос.
+Інфраструктура
+Vercel Hosting (CDN + HTTPS), GitHub Actions CI/CD
+DevOps
+1 ос.
+UI/UX
+Figma (wireframes + hi-fi + prototype), Design System Token-based T{}
+UI/UX Designer
+1 ос.
+2. Повна таблиця технологій
+Таблиця охоплює всі компоненти: фронтенд, AI-движок (3 модулі), база даних, бекенд, інфраструктура та UI/UX.
+Технологія
+Шар системи
+Що буде робити
+Чому саме ця технологія
+Можливі аналоги
+Відповідальний розробник у команді
+React 18 + JSX Hooks
+Фронтенд
+Побудова всього UI: 4 екрани (Welcome → Draw → Configure → Result). Управління станом через useState, useEffect, useRef. Компонентна архітектура.
+Компонентний підхід ідеальний для wizard-флоу з 4 фазами. Virtual DOM забезпечує швидкий ре-рендер canvas. Стандарт ринку 2024–2025.
+Vue 3, Svelte, Angular 17
+Frontend Dev
+HTML5 Canvas API
+Фронтенд
+Піксельний 2D-рендеринг: полігон кімнати, меблі (прямокутники), двері (зелені маркери), вікна (блакитні). 2 компоненти: RoomDrawCanvas і ResultCanvas.
+Єдиний нативний інструмент для довільного 2D без залежностей. Нульова латентність перемальовування. Точна геометрія полігону.
+SVG, Konva.js, Fabric.js, Three.js (2D)
+Frontend Dev
+Inline CSS Design Tokens (T{})
+Фронтенд
+Єдина кольорова система: T.bg=#090b12, T.accent=#4d7cff, T.text=#dde4f4, T.success=#3ecf6a тощо. Всі компоненти використовують токени.
+Ізоляція стилів — компонент незалежний від зовнішніх CSS файлів. Легке перемикання теми через один об'єкт. Zero-config для JSX.
+Tailwind CSS, Styled-components, CSS Modules, MUI
+Frontend Dev / Designer
+Google Fonts (Syne + JetBrains Mono)
+Фронтенд
+Syne 900 — заголовки, логотип. JetBrains Mono — технічні значення, AI відповіді, координати меблів. Завантажуються з CDN.
+Syne підкреслює tech-характер продукту. JetBrains Mono дає відчуття AI/code-середовища для чату і цифр. Обидва безкоштовні.
+Inter, Space Grotesk, Manrope, DM Sans
+UI/UX Designer
+FurnitureAI — Weighted Scoring
+AI Движок
+Підбирає меблі на основі: тип кімнати (40%), площа (25%), стиль (20%), ергономіка (15%). Повертає відсортований масив ID меблів.
+Rule-based AI дає детерміністичні результати без API-виклику. Нульова латентність. Легко пояснюваний і тестований.
+OpenAI API, Gemini API, Claude API, Ollama локально
+AI/ML Dev
+SmartPlacementAI — Constraint Satisfaction
+AI Движок
+Розміщення меблів: аналіз полігону → _classifyWalls() → LAYOUT_DB (16 шаблонів) → _spiralFind() → до 4 варіантів. Враховує двері і вікна.
+Геометричний підхід без ML-навчання: spiral search знаходить вільне місце за O(r²). Детермінований, offline, <50мс.
+MILP, Monte Carlo, Reinforcement Learning, SAT Solver
+AI/ML Dev
+DesignChatAI — NLP Pattern Matching
+AI Движок
+AI-асистент 'Ромул': regexp/keyword matching → DESIGN_KNOWLEDGE (кольори, ергономіка, освітлення). Контекст кімнати і стилю.
+Миттєва відповідь (280мс setTimeout). Не галюцинує. Специфічні відповіді про стиль і норми ергономіки (BIFMA, DBN).
+ChatGPT API, Dialogflow, Rasa NLU, Wit.ai
+AI/ML Dev
+GNN — PyTorch + MPS (v2, навчання)
+AI Движок
+Graph Neural Network: вузли=меблі, ребра=відносини (диван↔ТВ-тумба). 4 шари MPNN, 85K параметрів. Датасет 8000 планувань IKEA/Houzz.
+GNN враховує структурні зв'язки між меблями — неможливо для MLP. Навчання на M4 ~5хв. Export ONNX → inference в браузері <5мс.
+Random Forest, MLP без графа, Decision Trees
+AI/ML Dev
+React State — in-memory (useState)
+База даних
+Основне сховище сесії: polygon[], doorPts[], placed[], variants[], chatHistory[]. Скидається при перезавантаженні вкладки.
+Для MVP без бекенду не потрібна персистентність між сесіями. Нульова складність. Instant O(1) доступ.
+Redux, Zustand, Jotai, localStorage, IndexedDB
+Frontend Dev
+LAYOUT_DB — JS Object (16 шаблонів)
+База даних
+16 концепцій планування для 8 типів кімнат. Координати xW/yW (0..1 нормалізовані). Реальні дані IKEA/Houzz/ДБН В.2.2-15.
+Статичні дані оновлюються ~1/квартал. Версіонуються з кодом. Нульова мережева затримка читання. Структуровані за roomType.
+PostgreSQL, Firestore, Airtable, Supabase
+AI/ML Dev
+FURNITURE_DB — JS Array (50+ предметів)
+База даних
+Каталог меблів: id, name, category, width, height (см), icon, color, round. FURNITURE_MAP (fromEntries) для O(1) lookup.
+Статичний каталог. Array у коді = нульовий latency. FURNITURE_MAP забезпечує O(1) доступ по ID під час рендерингу.
+MongoDB, Sanity CMS, Contentful, Directus
+Frontend Dev
+Client-only SPA — без бекенду
+Бекенд
+Весь AI-розрахунок, UI і бізнес-логіка виконуються у браузері. Жодних серверних запитів під час роботи застосунку.
+Нульова інфраструктура. Нульовий мережевий latency для AI. Деплой = один статичний файл. Безкоштовне масштабування через CDN.
+Node.js + Express, FastAPI, Next.js API routes, Hono
+Tech Lead
+Vite — Bundler + Dev Server
+Бекенд
+Транспіляція JSX → JS, tree-shaking, HMR при розробці. Cold start <300мс. Bundle <200KB gzip для продакшену.
+Vite — найшвидший bundler 2024 для React. Нативний ESM. HMR <50мс. Конфігурація нульова для CRA-міграцій.
+Webpack 5, Parcel, Rollup, Create React App
+DevOps / Frontend Dev
+Vercel / Netlify — Hosting
+Інфраструктура
+Хостинг статичного SPA. Автоматичний HTTPS + CDN. Preview deployment на кожен PR. Custom domain support.
+Zero-cost для статики. Deploy за <60 секунд. Глобальний CDN (30+ edge). Analytics та Web Vitals вбудовані.
+AWS S3 + CloudFront, Firebase Hosting, GitHub Pages, Render
+DevOps
+GitHub Actions — CI/CD Pipeline
+Інфраструктура
+Автоматичний pipeline: lint → build → test → deploy при push до main. Preview URL на кожен Pull Request.
+Нативна інтеграція з GitHub. 2000 хв/місяць безкоштовно. YAML конфігурація, матриця браузерів для тестів.
+GitLab CI/CD, CircleCI, Jenkins, Bitbucket Pipelines
+DevOps
+Figma — Design Tool
+UI/UX
+Всі екрани: низькорівневі wireframes → hi-fi mockups → компонентна бібліотека → prototype flows → Dev Mode handoff.
+Галузевий стандарт. Реалтайм-колаборація 5+ осіб. Auto Layout для адаптивних компонентів. Dev Mode для pixel-inspect.
+Sketch, Adobe XD, Penpot (open source), Framer
+UI/UX Designer
+Design System — Token-based (T{})
+UI/UX
+Централізований T{} об'єкт: bg, card, accent, text, muted, border, success, danger. Canvas і компоненти — один джерело правди.
+Консистентний UI без розбіжностей між дизайном і кодом. Light/dark тема — одна зміна T. Легке A/B тестування кольорів.
+Material Design 3, Ant Design, Shadcn/ui, Radix UI
+UI/UX Designer
+3. Команда та зони відповідальності
+Роль в команді
+Технології
+Відповідальності
+Залученість
+Frontend Developer
+React 18, HTML5 Canvas, CSS Tokens, Vite
+UI компоненти, canvas рендеринг, стан застосунку, адаптивний layout
+1–2 ос.
+AI/ML Developer
+JavaScript AI класи, Python, PyTorch, ONNX
+FurnitureAI, SmartPlacementAI, DesignChatAI, LAYOUT_DB, GNN v2 модель
+1 ос.
+UI/UX Designer
+Figma, Design System, User Research
+Wireframes, hi-fi макети, Design System токени T{}, usability тести
+1 ос.
+DevOps
+GitHub Actions, Vercel/Netlify, Git
+CI/CD pipeline, деплой, bundle optimization, Web Vitals моніторинг
+0.5 ос.
+QA Engineer
+Тест-план, Chrome DevTools, Playwright
+Виконання 45 тест-кейсів, баг-репорти, регресійне тестування
+1 ос.
