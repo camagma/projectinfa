@@ -1,0 +1,341 @@
+﻿<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Planning.AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Syne:wght@600;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="ambient"></div>
+    <main id="app">
+      <section id="screen-login" class="screen active">
+        <div class="card login-card">
+          <div class="brand">PLANNING.AI</div>
+          <div class="auth-tabs">
+            <button class="chip auth-tab active" data-auth="login" data-i18n="login_tab">Вхід</button>
+            <button class="chip auth-tab" data-auth="register" data-i18n="register_tab">Реєстрація</button>
+          </div>
+          <label class="field">
+            <span data-i18n="login_label">Логін</span>
+            <input id="auth-login" type="text" placeholder="ivan" />
+          </label>
+          <label class="field">
+            <span data-i18n="password_label">Пароль</span>
+            <input id="auth-password" type="password" placeholder="••••••" />
+          </label>
+          <label class="field auth-confirm" id="auth-confirm-wrap">
+            <span data-i18n="confirm_label">Повторіть пароль</span>
+            <input id="auth-confirm" type="password" placeholder="••••••" />
+          </label>
+          <div class="auth-message" id="auth-message"></div>
+          <button class="btn primary" id="login-btn" data-i18n="next_btn">Далі</button>
+        </div>
+      </section>
+
+      <section id="screen-dashboard" class="screen">
+        <header class="topbar">
+          <div class="brand small">PLANNING.AI</div>
+          <div class="top-actions">
+            <button class="chip lang-btn" data-lang="en">EN</button>
+            <button class="chip lang-btn" data-lang="ua">UA</button>
+            <button class="chip theme-btn" data-theme="light">☀</button>
+            <button class="chip theme-btn" data-theme="dark">☾</button>
+            <button class="chip settings-btn" data-action="settings">ID</button>
+          </div>
+        </header>
+        <div class="dashboard-grid">
+          <div class="card hero">
+            <h2 data-i18n="dashboard_title">Почнімо новий проєкт</h2>
+            <p data-i18n="dashboard_subtitle">Створи кімнату, задай стиль і отримай оптимальне планування.</p>
+            <button class="btn primary" id="new-project-btn" data-i18n="create_room_btn">Створити нову кімнату</button>
+            <button class="btn ghost" data-i18n="continue_btn">Продовжити створення</button>
+          </div>
+          <div class="card preview">
+            <div class="preview-img"></div>
+          </div>
+          <div class="card recent">
+            <h3 data-i18n="previous_works">Ваші попередні роботи</h3>
+            <div class="thumb-row">
+              <div class="thumb"></div>
+              <div class="thumb"></div>
+              <div class="thumb"></div>
+              <div class="thumb"></div>
+            </div>
+            <div class="project-list" id="project-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="screen-draw" class="screen">
+        <header class="topbar editor-topbar center-title">
+          <button class="icon-btn menu-btn">≡</button>
+          <div class="title" data-i18n="draw_title">Малювання кімнати</div>
+          <div class="top-actions">
+            <button class="chip lang-btn" data-lang="en">EN</button>
+            <button class="chip lang-btn" data-lang="ua">UA</button>
+            <button class="chip theme-btn" data-theme="light">☀</button>
+            <button class="chip theme-btn" data-theme="dark">☾</button>
+            <button class="chip settings-btn" data-action="settings">ID</button>
+          </div>
+        </header>
+        <div class="draw-grid">
+          <aside class="panel draw-panel">
+            <div class="panel-title" data-i18n="shape_title">Форма кімнати</div>
+            <div class="pill-group vertical" id="room-shape">
+              <button class="pill" data-value="rect" data-i18n="shape_rect">• Прямокутна</button>
+              <button class="pill" data-value="square" data-i18n="shape_square">• Квадратна</button>
+              <button class="pill active" data-value="custom" data-i18n="shape_custom">• Своя форма</button>
+            </div>
+            <div class="panel-title" data-i18n="tools_title">Інструменти</div>
+            <div class="pill-group vertical" id="draw-tool">
+              <button class="pill active" data-value="wall" data-i18n="tool_wall">• Стіна</button>
+            </div>
+            <div class="shape-controls" id="shape-rect">
+              <label>
+                <span data-i18n="rect_width">Ширина (м)</span>
+                <input id="rect-width" type="number" min="2" max="12" step="0.1" value="4.5" />
+              </label>
+              <label>
+                <span data-i18n="rect_height">Висота (м)</span>
+                <input id="rect-height" type="number" min="2" max="12" step="0.1" value="3.6" />
+              </label>
+            </div>
+            <div class="shape-controls" id="shape-square">
+              <label>
+                <span data-i18n="square_size">Сторона (м)</span>
+                <input id="square-size" type="number" min="2" max="12" step="0.1" value="4.0" />
+              </label>
+            </div>
+            <div class="info-card">
+              <span data-i18n="area_label">Площа</span>
+              <strong id="room-area">0 м²</strong>
+            </div>
+            <label class="btn ghost upload-btn">
+              <span data-i18n="upload_plan">Завантажити план</span>
+              <input id="plan-upload" type="file" accept="image/*" />
+            </label>
+            <button class="btn ghost" id="clear-draw" data-i18n="clear_btn">Очистити</button>
+            <button class="btn primary big" id="to-configure" data-i18n="next_btn">Далі</button>
+          </aside>
+          <section class="canvas-wrap draw-canvas-wrap">
+            <canvas id="draw-canvas" width="1100" height="640"></canvas>
+            <div class="hint" data-i18n="draw_hint">Клацай, щоб додати точки. Подвійний клік — замкнути кімнату.</div>
+          </section>
+        </div>
+      </section>
+
+      <section id="screen-editor" class="screen">
+        <header class="topbar editor-topbar">
+          <button class="icon-btn menu-btn">≡</button>
+          <div class="title" data-i18n="editor_title">Створення кімнати</div>
+          <div class="top-actions">
+            <button class="chip lang-btn" data-lang="en">EN</button>
+            <button class="chip lang-btn" data-lang="ua">UA</button>
+            <button class="chip theme-btn" data-theme="light">☀</button>
+            <button class="chip theme-btn" data-theme="dark">☾</button>
+            <button class="chip settings-btn" data-action="settings">ID</button>
+          </div>
+        </header>
+        <div class="editor-grid">
+          <aside class="panel left-panel">
+            <div class="panel-title" data-i18n="room_type_title">Тип кімнати:</div>
+            <div class="pill-group vertical room-list" id="room-type">
+              <button class="pill active" data-value="kitchen" data-i18n="room_kitchen">• Кухня</button>
+              <button class="pill" data-value="living" data-i18n="room_living">• Вітальня</button>
+              <button class="pill" data-value="bedroom" data-i18n="room_bedroom">• Спальня</button>
+              <button class="pill" data-value="bathroom" data-i18n="room_bathroom">• Ванна</button>
+            </div>
+
+            <div class="budget-card">
+              <span data-i18n="budget_label">Бюджет</span>
+              <div class="budget-control">
+                <input id="budget-input" type="number" min="100" max="5000" step="50" value="500" />
+                <span class="budget-currency">$</span>
+              </div>
+            </div>
+
+            <div class="slider-row">
+              <label data-i18n="width_label">Ширина (м)</label>
+              <input id="room-width" type="range" min="2.5" max="7" step="0.1" value="4.5" />
+              <span id="room-width-val">4.5</span>
+            </div>
+            <div class="slider-row">
+              <label data-i18n="height_label">Висота (м)</label>
+              <input id="room-height" type="range" min="2.5" max="6" step="0.1" value="3.6" />
+              <span id="room-height-val">3.6</span>
+            </div>
+
+            <div class="toggle-row">
+              <span>AI + GNN</span>
+              <label class="switch">
+                <input type="checkbox" id="use-gnn" checked />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <button class="btn primary big" id="generate-btn" data-i18n="create_btn">Створити</button>
+          </aside>
+
+          <aside class="panel style-panel">
+            <div class="panel-title" data-i18n="style_title">Оберіть стиль:</div>
+            <div class="style-list" id="room-style">
+              <button class="style-card active" data-value="modern">
+                <div class="style-thumb modern"></div>
+              </button>
+              <button class="style-card" data-value="scandi">
+                <div class="style-thumb scandi"></div>
+              </button>
+              <button class="style-card" data-value="loft">
+                <div class="style-thumb loft"></div>
+              </button>
+              <button class="style-card" data-value="classic">
+                <div class="style-thumb classic"></div>
+              </button>
+            </div>
+          </aside>
+
+          <aside class="panel material-panel">
+            <div class="material-block">
+              <div class="material-head">
+                <div class="material-title" data-i18n="floor_title">Покриття</div>
+                <div class="material-row">
+                  <button class="material-swatch grid active" data-value="tile"></button>
+                  <button class="material-swatch wood" data-value="wood_dark"></button>
+                  <button class="material-swatch wood-2" data-value="wood_light"></button>
+                </div>
+              </div>
+              <div class="divider"></div>
+            </div>
+            <div class="material-block">
+              <div class="material-head">
+                <div class="material-title" data-i18n="wall_title">Шпалери</div>
+                <div class="material-row">
+                  <button class="material-swatch wine active" data-value="wine"></button>
+                  <button class="material-swatch beige" data-value="beige"></button>
+                  <button class="material-swatch light" data-value="light"></button>
+                </div>
+              </div>
+              <div class="divider"></div>
+            </div>
+            <div class="material-block">
+              <div class="material-head">
+                <div class="material-title" data-i18n="furniture_title">Меблі</div>
+              </div>
+              <div class="tile-filter">
+                <input id="furniture-search" type="text" placeholder="Пошук меблів..." data-i18n-placeholder="search_placeholder" />
+              </div>
+              <div class="furniture-tiles" id="furniture-tiles"></div>
+              <div class="select-actions">
+                <button class="btn ghost" id="select-all" data-i18n="select_all">Всі</button>
+                <button class="btn ghost" id="select-none" data-i18n="select_none">Очистити</button>
+              </div>
+              <div class="summary">
+                <div>
+                  <span data-i18n="items_label">Предметів</span>
+                  <strong id="item-count">0</strong>
+                </div>
+                <div>
+                  <span data-i18n="source_label">Джерело</span>
+                  <strong id="engine-label">Local</strong>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          <section class="canvas-wrap">
+            <canvas id="room-canvas" width="900" height="520"></canvas>
+            <div class="hint" data-i18n="editor_hint">Перетягніть меблі або натисніть «Створити».</div>
+          </section>
+        </div>
+      </section>
+
+      <section id="screen-result" class="screen">
+        <header class="topbar editor-topbar">
+          <button class="icon-btn menu-btn">≡</button>
+          <div class="title" data-i18n="result_title">Результат</div>
+          <div class="top-actions">
+            <button class="chip lang-btn" data-lang="en">EN</button>
+            <button class="chip lang-btn" data-lang="ua">UA</button>
+            <button class="chip theme-btn" data-theme="light">☀</button>
+            <button class="chip theme-btn" data-theme="dark">☾</button>
+            <button class="chip settings-btn" data-action="settings">ID</button>
+          </div>
+        </header>
+        <div class="result-grid">
+          <section class="canvas-wrap result-canvas-wrap">
+            <canvas id="result-canvas" width="900" height="520"></canvas>
+          </section>
+          <aside class="panel result-panel">
+            <div class="panel-title" data-i18n="variants_title">Варіанти</div>
+            <div class="variant-row" id="variant-row"></div>
+            <div class="panel-title" data-i18n="list_title">Список меблів</div>
+            <div class="result-list" id="result-list"></div>
+            <div class="cost-card">
+              <span data-i18n="total_cost">Загальна вартість</span>
+              <strong id="total-cost">$0</strong>
+            </div>
+            <div class="panel-title" data-i18n="chat_title">Чат</div>
+            <div class="chat-box" id="chat-box"></div>
+            <div class="chat-input">
+              <input id="chat-input" type="text" placeholder="Напиши запит..." data-i18n-placeholder="chat_placeholder" />
+              <button class="btn primary" id="chat-send" data-i18n="send_btn">Надіслати</button>
+            </div>
+            <div class="result-actions">
+              <button class="btn ghost" id="save-project" data-i18n="save_btn">Зберегти</button>
+              <button class="btn primary" id="new-project" data-i18n="new_room_btn">Нова кімната</button>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <div class="modal" id="settings-modal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 data-i18n="settings_title">Налаштування</h3>
+          <button class="icon-btn modal-close" aria-label="Close">×</button>
+        </div>
+        <div class="modal-section">
+          <div class="panel-title" data-i18n="support_title">Підтримка / Допомога</div>
+          <div class="support-item">
+            <span data-i18n="support_phone">Телефон</span>
+            <a href="tel:+380991234567">+38 (099) 123-45-67</a>
+          </div>
+          <div class="support-item">
+            <span>Telegram</span>
+            <a href="https://t.me/roomai_support" target="_blank" rel="noreferrer">@roomai_support</a>
+          </div>
+          <div class="support-item">
+            <span>Email</span>
+            <a href="mailto:support@roomai.app">support@roomai.app</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="drawer" id="app-drawer">
+      <div class="drawer-card">
+        <div class="drawer-header">
+          <div class="brand small">PLANNING.AI</div>
+          <button class="icon-btn drawer-close" aria-label="Close">×</button>
+        </div>
+        <div class="drawer-links">
+          <button class="drawer-link" data-target="dashboard" data-i18n="menu_dashboard">Головна</button>
+          <button class="drawer-link" data-target="draw" data-i18n="menu_draw">Малювання</button>
+          <button class="drawer-link" data-target="editor" data-i18n="menu_configure">Налаштування</button>
+          <button class="drawer-link" data-target="result" data-i18n="menu_result">Результат</button>
+          <button class="drawer-link" data-target="settings" data-i18n="menu_support">Підтримка</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
